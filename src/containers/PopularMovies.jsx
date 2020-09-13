@@ -1,20 +1,19 @@
 import React, {useState, useEffect} from 'react';
 import {MoviesList} from '../components/MoviesList';
 import { getPopularMovies } from '../services/MovieService';
+import { FIRST_PAGE_ITEM, INITIAL_PAGE, INITIAL_LOADING_STATE, LAST_PAGE_ITEM, PAGE_LOADED_STATE } from '../utils/constants';
 
-export const PopularMovies = (props) => {
-    const [page, setPage] = useState(1);
+export const PopularMovies = () => {
+    const [page, setPage] = useState(INITIAL_PAGE);
+    const [isLoading, setLoading] = useState(INITIAL_LOADING_STATE);
     const [data, setData] = useState([]);
-    const [isLoading, setLoading] = useState(true);
   
     useEffect(() => {
       getPopularMovies(page).then(response => {
-        if (page > 1 ) {
-          setData([...data.slice(1,20), ...response.data.results]);
-        } else {
-          setData(response.data.results);
-        }
-        setLoading(false);
+        page > INITIAL_PAGE ? 
+            setData([...data.slice(FIRST_PAGE_ITEM, LAST_PAGE_ITEM), ...response.data.results]) 
+            : setData(response.data.results);
+        setLoading(PAGE_LOADED_STATE);
       }).catch(error => console.log(error));
     }, [page]);
   
@@ -24,7 +23,7 @@ export const PopularMovies = (props) => {
   
     return (
       <>
-      <h1> Popular</h1>
+        <h1> Popular</h1>
         {isLoading ? <div>...loading</div> : <MoviesList movies={data} counter={page} onClick={() => handleClick()}/>}
       </>
     );
